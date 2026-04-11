@@ -18,17 +18,21 @@ export default function RegisterPage({ onDone, onBack }: Props) {
     const [error, setError] = useState('')
     const [isLoading, setIsLoading] = useState(false)
 
+<<<<<<< HEAD
     const handleRegister = async () => {
         setError('')
+=======
+    const handleRegister = (e?: React.FormEvent) => {
+        if (e) e.preventDefault(); // 엔터 키 제출 시 페이지 새로고침 방지
+
+        // 1. 모든 필드 입력 여부 확인
+>>>>>>> ebd88dc4479603fcb8dfe54627fb8c852f75be6f
         if (!email || !userName || !password) {
-            setError('모든 필드를 입력해주세요.')
-            return
-        }
-        if (password !== passwordConfirm) {
-            setError('비밀번호가 일치하지 않습니다.')
-            return
+            setError('모든 필드를 입력해주세요.');
+            return;
         }
 
+<<<<<<< HEAD
         setIsLoading(true)
         try {
             const res = await signup(email, password, userName)
@@ -46,7 +50,32 @@ export default function RegisterPage({ onDone, onBack }: Props) {
         } finally {
             setIsLoading(false)
         }
+=======
+        // 2. 이름 길이 체크 (최소 2자 이상)
+        if (userName.trim().length < 2) {
+            setError('이름은 최소 2자 이상 입력해야 합니다.');
+            return;
+        }
+
+        // 3. 비밀번호 길이 체크 (최소 8자 이상)
+        if (password.length < 8) {
+            setError('비밀번호는 최소 8자 이상이어야 합니다.');
+            return;
+        }
+
+        // 4. 비밀번호 확인 일치 여부
+        if (password !== passwordConfirm) {
+            setError('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+
+        // 모든 조건 통과 시 등록
+        setUser({ user_id: Date.now(), user_name: userName, login_id: email, isMember: true });
+        setIsGuest(false);
+        onDone();
+>>>>>>> ebd88dc4479603fcb8dfe54627fb8c852f75be6f
     }
+    
 
     const containerStyle: React.CSSProperties = {
         width: '100%',
@@ -127,7 +156,8 @@ export default function RegisterPage({ onDone, onBack }: Props) {
                     </div>
                 </div>
 
-                <div style={containerStyle}>
+                {/* div 대신 form을 사용하고 onSubmit 추가 */}
+                <form style={containerStyle} onSubmit={handleRegister}>
                     <div style={inputWrapperStyle}>
                         <div style={labelStyle}>이메일 주소</div>
                         <input value={email} onChange={e => setEmail(e.target.value)}
@@ -163,18 +193,24 @@ export default function RegisterPage({ onDone, onBack }: Props) {
                         </div>
                     )}
 
+<<<<<<< HEAD
                     <button onClick={handleRegister} disabled={isLoading} style={primaryButtonStyle}>
                         {isLoading ? '⏳ 가입 중...' : '회원가입 완료'}
+=======
+                    {/* 버튼 타입을 submit으로 명시 */}
+                    <button type="submit" style={primaryButtonStyle}>
+                        회원가입 완료
+>>>>>>> ebd88dc4479603fcb8dfe54627fb8c852f75be6f
                     </button>
 
-                    <button onClick={onBack} style={{
+                    <button type="button" onClick={onBack} style={{
                         width: '100%', background: 'none', border: 'none',
                         fontSize: '13px', color: '#7a8099', cursor: 'pointer',
                         textDecoration: 'underline', marginTop: '4px'
                     }}>
                         이미 계정이 있으신가요? 로그인하기
                     </button>
-                </div>
+                </form>
             </div>
             <style>{`@keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } }`}</style>
         </div>
