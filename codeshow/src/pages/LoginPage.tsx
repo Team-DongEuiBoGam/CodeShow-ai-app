@@ -36,6 +36,7 @@ export default function LoginPage({ onDone, onGoToRegister }: Props) {
         fontSize: '14px',
         color: '#e8eaf0',
         outline: 'none',
+        boxShadow: 'none', 
         fontFamily: 'inherit',
         boxSizing: 'border-box' 
     };
@@ -96,7 +97,10 @@ export default function LoginPage({ onDone, onGoToRegister }: Props) {
                     </form>
                 )}
             </div>
-            <style>{`@keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } }`}</style>
+            <style>{`
+                @keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } } 
+                input:focus, button:focus { outline: none !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent; }
+            `}</style>
         </div>
     )
 }

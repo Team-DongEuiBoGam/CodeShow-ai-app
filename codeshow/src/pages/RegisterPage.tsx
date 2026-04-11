@@ -16,20 +16,39 @@ export default function RegisterPage({ onDone, onBack }: Props) {
     const [passwordConfirm, setPasswordConfirm] = useState('')
     const [error, setError] = useState('')
 
-    const handleRegister = () => {
+    const handleRegister = (e?: React.FormEvent) => {
+        if (e) e.preventDefault(); // 엔터 키 제출 시 페이지 새로고침 방지
+
+        // 1. 모든 필드 입력 여부 확인
         if (!email || !userName || !password) {
-            setError('모든 필드를 입력해주세요.')
-            return
-        }
-        if (password !== passwordConfirm) {
-            setError('비밀번호가 일치하지 않습니다.')
-            return
+            setError('모든 필드를 입력해주세요.');
+            return;
         }
 
-        setUser({ user_id: Date.now(), user_name: userName, login_id: email, isMember: true })
-        setIsGuest(false)
-        onDone()
+        // 2. 이름 길이 체크 (최소 2자 이상)
+        if (userName.trim().length < 2) {
+            setError('이름은 최소 2자 이상 입력해야 합니다.');
+            return;
+        }
+
+        // 3. 비밀번호 길이 체크 (최소 8자 이상)
+        if (password.length < 8) {
+            setError('비밀번호는 최소 8자 이상이어야 합니다.');
+            return;
+        }
+
+        // 4. 비밀번호 확인 일치 여부
+        if (password !== passwordConfirm) {
+            setError('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+
+        // 모든 조건 통과 시 등록
+        setUser({ user_id: Date.now(), user_name: userName, login_id: email, isMember: true });
+        setIsGuest(false);
+        onDone();
     }
+    
 
 
     // 공통 스타일 정의 (대칭 및 일관성)
@@ -111,7 +130,8 @@ export default function RegisterPage({ onDone, onBack }: Props) {
                     </div>
                 </div>
 
-                <div style={containerStyle}>
+                {/* div 대신 form을 사용하고 onSubmit 추가 */}
+                <form style={containerStyle} onSubmit={handleRegister}>
                     <div style={inputWrapperStyle}>
                         <div style={labelStyle}>이메일 주소</div>
                         <input value={email} onChange={e => setEmail(e.target.value)}
@@ -145,18 +165,19 @@ export default function RegisterPage({ onDone, onBack }: Props) {
                         </div>
                     )}
 
-                    <button onClick={handleRegister} style={primaryButtonStyle}>
+                    {/* 버튼 타입을 submit으로 명시 */}
+                    <button type="submit" style={primaryButtonStyle}>
                         회원가입 완료
                     </button>
 
-                    <button onClick={onBack} style={{
+                    <button type="button" onClick={onBack} style={{
                         width: '100%', background: 'none', border: 'none',
                         fontSize: '13px', color: '#7a8099', cursor: 'pointer', 
                         textDecoration: 'underline', marginTop: '4px'
                     }}>
                         이미 계정이 있으신가요? 로그인하기
                     </button>
-                </div>
+                </form>
             </div>
             <style>{`@keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } }`}</style>
         </div>
