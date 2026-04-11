@@ -4,7 +4,7 @@ import MemoryCanvas from '../components/Visualizer/MemoryCanvas'
 import { useAppStore } from '../store/useAppStore'
 import { mockAnalyze } from '../api/analyze'
 
-export default function MainPage() {
+export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => void }) {
     const {
         user, isGuest, code, language, setLanguage,
         steps, currentStep, setSteps, nextStep, prevStep,
@@ -94,6 +94,9 @@ export default function MainPage() {
                     </div>
                     <button onClick={handleSave} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: '#1e2330', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', fontWeight: 500, cursor: 'pointer', color: '#e8eaf0', transition: 'all 0.18s ease' }}>
                         💾 저장
+                    </button>
+                    <button onClick={onGoToSaveList} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: 'rgba(108, 140, 255, 0.12)', border: '1px solid rgba(108, 140, 255, 0.2)', borderRadius: '8px', fontSize: '13px', fontWeight: 500, cursor: 'pointer', color: '#6c8cff', transition: 'all 0.18s ease' }}>
+                        📂 저장목록
                     </button>
                     <button onClick={handleAnalyze} disabled={isAnalyzing}
                         style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 16px', background: '#6c8cff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#fff', transition: 'all 0.18s ease', opacity: isAnalyzing ? 0.7 : 1 }}>

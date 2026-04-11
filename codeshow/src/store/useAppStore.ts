@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Step, User } from '../types/memory'
+import type { Step, User, SavedAnimation } from '../types/memory'
 
 interface AppStore {
     user: User | null
@@ -19,6 +19,8 @@ interface AppStore {
     nextStep: () => void
     prevStep: () => void
     resetSteps: () => void
+
+    savedAnimations: SavedAnimation[]
 
     isAnalyzing: boolean
     setIsAnalyzing: (v: boolean) => void
@@ -50,6 +52,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
             set({ currentStep: currentStep - 1 })
     },
     resetSteps: () => set({ steps: [], currentStep: -1 }),
+
+    savedAnimations: [],
 
     isAnalyzing: false,
     setIsAnalyzing: (v) => set({ isAnalyzing: v }),
