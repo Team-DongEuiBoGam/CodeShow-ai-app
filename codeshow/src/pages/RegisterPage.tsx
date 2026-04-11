@@ -29,8 +29,6 @@ export default function RegisterPage({ onDone, onBack }: Props) {
             return
         }
 
-<<<<<<< HEAD
-        // ✅ 실제 회원가입 API 연동
         setIsLoading(true)
         try {
             const res = await signup(email, password, userName)
@@ -50,15 +48,6 @@ export default function RegisterPage({ onDone, onBack }: Props) {
         }
     }
 
-=======
-        setUser({ user_id: Date.now(), user_name: userName, login_id: email, isMember: true })
-        setIsGuest(false)
-        onDone()
-    }
-
-
-    // 공통 스타일 정의 (대칭 및 일관성)
->>>>>>> dfd9b1f891053e74a19deef7deb0b3e7a111f81d
     const containerStyle: React.CSSProperties = {
         width: '100%',
         display: 'flex',
