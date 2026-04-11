@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useAppStore } from '../store/useAppStore'
+import { login, guestLogin } from '../api/analyze'
 
 interface Props {
     onDone: () => void
-    onGoToRegister: () => void 
+    onGoToRegister: () => void
 }
 
 export default function LoginPage({ onDone, onGoToRegister }: Props) {
@@ -12,19 +13,50 @@ export default function LoginPage({ onDone, onGoToRegister }: Props) {
     const [view, setView] = useState<'choice' | 'login'>('choice')
     const [loginId, setLoginId] = useState('')
     const [password, setPassword] = useState('')
+    const [error, setError] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
 
-    const handleLogin = (e?: React.FormEvent) => {
-        if (e) e.preventDefault() 
-        const name = loginId.split('@')[0] || 'user'
-        setUser({ user_id: 1, user_name: name, login_id: loginId, isMember: true })
-        setIsGuest(false)
-        onDone()
+    // ✅ 실제 로그인 API 연동
+    const handleLogin = async () => {
+        setError('')
+        setIsLoading(true)
+        try {
+            const res = await login(loginId, password)
+            setUser({
+                user_id: res.userId,
+                user_name: res.username,
+                login_id: res.loginId,
+                isMember: true,
+                token: res.accessToken
+            })
+            setIsGuest(false)
+            onDone()
+        } catch {
+            setError('아이디 또는 비밀번호가 올바르지 않습니다.')
+        } finally {
+            setIsLoading(false)
+        }
     }
 
-    const handleGuest = () => {
-        setUser(null)
-        setIsGuest(true)
-        onDone()
+    // ✅ 비회원 API 연동
+    const handleGuest = async () => {
+        setIsLoading(true)
+        try {
+            const res = await guestLogin()
+            setUser({
+                user_id: 0,
+                user_name: res.username,
+                login_id: '',
+                isMember: false,
+                token: res.accessToken
+            })
+            setIsGuest(true)
+            onDone()
+        } catch {
+            setError('비회원 로그인에 실패했습니다.')
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     const inputStyle: React.CSSProperties = {
@@ -37,8 +69,8 @@ export default function LoginPage({ onDone, onGoToRegister }: Props) {
         color: '#e8eaf0',
         outline: 'none',
         fontFamily: 'inherit',
-        boxSizing: 'border-box' 
-    };
+        boxSizing: 'border-box'
+    }
 
     return (
         <div style={{
@@ -63,37 +95,63 @@ export default function LoginPage({ onDone, onGoToRegister }: Props) {
                 </div>
 
                 {view === 'choice' ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <button onClick={() => setView('login')} style={{ width: '100%', padding: '12px', background: '#6c8cff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: 600, color: '#fff', cursor: 'pointer', boxSizing: 'border-box' }}>🔐 회원 로그인</button>
-                        <button onClick={handleGuest} style={{ width: '100%', padding: '12px', background: '#1e2330', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#e8eaf0', cursor: 'pointer', boxSizing: 'border-box' }}>👤 비회원으로 시작</button>
-                        <div style={{ textAlign: 'center', fontSize: '12px', color: '#404560' }}>비회원은 애니메이션 저장이 제한됩니다</div>
-                    </div>
+                    <>
+                        <button onClick={() => setView('login')} style={{
+                            width: '100%', padding: '12px', background: '#6c8cff', border: 'none',
+                            borderRadius: '10px', fontSize: '15px', fontWeight: 600, color: '#fff',
+                            cursor: 'pointer', marginBottom: '12px'
+                        }}>🔐 회원 로그인</button>
+                        <button onClick={handleGuest} disabled={isLoading} style={{
+                            width: '100%', padding: '12px', background: '#1e2330',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#e8eaf0',
+                            cursor: 'pointer', opacity: isLoading ? 0.7 : 1
+                        }}>
+                            {isLoading ? '⏳ 로딩 중...' : '👤 비회원으로 시작'}
+                        </button>
+                    </>
                 ) : (
-                    <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <button type="button" onClick={() => setView('choice')} style={{ background: 'none', border: 'none', color: '#7a8099', fontSize: '13px', cursor: 'pointer', marginBottom: '16px', textAlign: 'left', padding: 0 }}>
                             ← 뒤로
                         </button>
                         <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '11px', fontWeight: 600, color: '#7a8099', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px', marginLeft: '4px' }}>이메일</div>
-                            <input value={loginId} onChange={e => setLoginId(e.target.value)} placeholder="example@email.com" style={inputStyle} />
+                            <div style={{ fontSize: '11px', fontWeight: 600, color: '#7a8099', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>아이디</div>
+                            <input value={loginId} onChange={e => setLoginId(e.target.value)}
+                                placeholder="아이디 입력"
+                                style={inputStyle} />
                         </div>
                         <div style={{ marginBottom: '20px' }}>
-                            <div style={{ fontSize: '11px', fontWeight: 600, color: '#7a8099', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px', marginLeft: '4px' }}>비밀번호</div>
-                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" style={inputStyle} />
+                            <div style={{ fontSize: '11px', fontWeight: 600, color: '#7a8099', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>비밀번호</div>
+                            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                                placeholder="••••••••"
+                                onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                                style={inputStyle} />
                         </div>
-                        
-                        <button type="submit" style={{ width: '100%', padding: '12px', background: '#6c8cff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: 600, color: '#fff', cursor: 'pointer', boxSizing: 'border-box' }}>로그인</button>
 
-                        <button type="button" onClick={onGoToRegister} style={{
-                            width: '100%', padding: '12px', background: 'transparent', 
-                            border: '1px solid rgba(108,140,255,0.5)', borderRadius: '10px', 
-                            fontSize: '14px', fontWeight: 500, color: '#6c8cff', 
-                            cursor: 'pointer', marginTop: '12px', boxSizing: 'border-box'
+                        {error && (
+                            <div style={{ fontSize: '13px', color: '#fc8181', marginBottom: '12px', textAlign: 'center' }}>
+                                ⚠️ {error}
+                            </div>
+                        )}
+
+                        <button onClick={handleLogin} disabled={isLoading} style={{
+                            width: '100%', padding: '12px', background: '#6c8cff', border: 'none',
+                            borderRadius: '10px', fontSize: '15px', fontWeight: 600, color: '#fff',
+                            cursor: 'pointer', opacity: isLoading ? 0.7 : 1
+                        }}>
+                            {isLoading ? '⏳ 로그인 중...' : '로그인'}
+                        </button>
+
+                        <button onClick={onGoToRegister} style={{
+                            width: '100%', padding: '12px', background: 'transparent',
+                            border: '1px solid rgba(108,140,255,0.5)', borderRadius: '10px',
+                            fontSize: '14px', fontWeight: 500, color: '#6c8cff',
+                            cursor: 'pointer', marginTop: '12px'
                         }}>
                             회원가입 하기
                         </button>
-                        <div style={{ textAlign: 'center', fontSize: '12px', color: '#404560', marginTop: '10px' }}>데모 모드: 아무 값이나 입력하세요</div>
-                    </form>
+                    </div>
                 )}
             </div>
             <style>{`@keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } }`}</style>

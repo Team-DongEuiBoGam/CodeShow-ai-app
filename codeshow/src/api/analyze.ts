@@ -10,9 +10,27 @@ export const analyzeCode = async (code: string, language: string): Promise<Step[
     return res.data
 }
 
+export const signup = async (loginId: string, password: string, username: string) => {
+    const res = await axios.post(`${BASE_URL}/api/auth/signup`, {
+        loginId,
+        password,
+        username
+    })
+    return res.data
+}
+
 // ── 로그인 ──
 export const login = async (login_id: string, password: string) => {
-    const res = await axios.post(`${BASE_URL}/api/auth/login`, { login_id, password })
+    const res = await axios.post(`${BASE_URL}/api/auth/login`, {
+        loginId: login_id,   // ✅ camelCase로 수정
+        password
+    })
+    return res.data
+}
+
+// ── 비회원 로그인 ──
+export const guestLogin = async () => {
+    const res = await axios.post(`${BASE_URL}/api/auth/guest-login`)
     return res.data
 }
 
