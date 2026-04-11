@@ -1,14 +1,28 @@
-import { useState } from 'react'
-import LoginPage from './pages/LoginPage'
-import MainPage from './pages/MainPage'
+import { useState } from 'react';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import MainPage from './pages/MainPage';
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(false)
+  const [view, setView] = useState<'login' | 'register'>('login');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // 로그인/회원가입 완료 시 메인으로 이동
+  if (isLoggedIn) return <MainPage />;
 
   return (
     <>
-      {!loggedIn && <LoginPage onDone={() => setLoggedIn(true)} />}
-      <MainPage />
+      {view === 'login' ? (
+        <LoginPage 
+          onDone={() => setIsLoggedIn(true)} 
+          onGoToRegister={() => setView('register')} 
+        />
+      ) : (
+        <RegisterPage 
+          onDone={() => setIsLoggedIn(true)} 
+          onBack={() => setView('login')} 
+        />
+      )}
     </>
-  )
+  );
 }
