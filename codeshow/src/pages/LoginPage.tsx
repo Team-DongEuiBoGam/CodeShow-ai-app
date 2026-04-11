@@ -3,11 +3,12 @@ import { useAppStore } from '../store/useAppStore'
 
 interface Props {
     onDone: () => void
+    onGoToRegister: () => void 
 }
 
-export default function LoginPage({ onDone }: Props) {
-    const setUser = useAppStore((s) => s.setUser)
-    const setIsGuest = useAppStore((s) => s.setIsGuest)
+export default function LoginPage({ onDone, onGoToRegister }: Props) {
+    const setUser = useAppStore((s: any) => s.setUser)
+    const setIsGuest = useAppStore((s: any) => s.setIsGuest)
     const [view, setView] = useState<'choice' | 'login'>('choice')
     const [loginId, setLoginId] = useState('')
     const [password, setPassword] = useState('')
@@ -63,9 +64,6 @@ export default function LoginPage({ onDone }: Props) {
                             borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#e8eaf0',
                             cursor: 'pointer'
                         }}>👤 비회원으로 시작</button>
-                        <div style={{ textAlign: 'center', fontSize: '12px', color: '#404560', marginTop: '12px' }}>
-                            비회원은 애니메이션 저장이 제한됩니다
-                        </div>
                     </>
                 ) : (
                     <>
@@ -84,10 +82,22 @@ export default function LoginPage({ onDone }: Props) {
                                 placeholder="••••••••"
                                 style={{ width: '100%', padding: '10px 14px', background: '#1e2330', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '14px', color: '#e8eaf0', outline: 'none', fontFamily: 'inherit' }} />
                         </div>
+                        
                         <button onClick={handleLogin} style={{
                             width: '100%', padding: '12px', background: '#6c8cff', border: 'none',
                             borderRadius: '10px', fontSize: '15px', fontWeight: 600, color: '#fff', cursor: 'pointer'
                         }}>로그인</button>
+
+                        {/* 로그인 버튼 바로 아래 추가된 회원가입 버튼 */}
+                        <button onClick={onGoToRegister} style={{
+                            width: '100%', padding: '12px', background: 'transparent', 
+                            border: '1px solid rgba(108,140,255,0.5)', borderRadius: '10px', 
+                            fontSize: '14px', fontWeight: 500, color: '#6c8cff', 
+                            cursor: 'pointer', marginTop: '12px'
+                        }}>
+                            회원가입 하기
+                        </button>
+
                         <div style={{ textAlign: 'center', fontSize: '12px', color: '#404560', marginTop: '10px' }}>데모 모드: 아무 값이나 입력하세요</div>
                     </>
                 )}
