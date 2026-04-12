@@ -44,6 +44,20 @@ export default function SavelistPage({ onBack }: Props) {
         fetchList()
     }, [user])
 
+    // 삭제 버튼 클릭 핸들러
+    const handleDelete = async (e: React.MouseEvent, animationId: number) => {
+        e.stopPropagation() // 상세 페이지 이동 방지
+        if (!window.confirm('정말 삭제하시겠습니까?')) return
+
+        try {
+            // TODO: 실제 삭제 API가 완성되면 여기에 추가 (예: await deleteAnimation(animationId, user?.token))
+            setList((prev) => prev.filter((item) => item.animationId !== animationId))
+            alert('삭제되었습니다.')
+        } catch {
+            alert('삭제 중 오류가 발생했습니다.')
+        }
+    }
+
     const handleOpenDetail = async (animationId: number) => {
         if (!user?.token) {
             setError('로그인이 필요합니다.')
@@ -107,7 +121,8 @@ export default function SavelistPage({ onBack }: Props) {
                             borderRadius: '12px',
                             background: '#1a1f2b',
                             border: '1px solid rgba(255,255,255,0.08)',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            position: 'relative' // 버튼 배치를 위한 기준점
                         }}
                     >
                         <div
@@ -115,7 +130,8 @@ export default function SavelistPage({ onBack }: Props) {
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 marginBottom: '8px',
-                                gap: '12px'
+                                gap: '12px',
+                                paddingRight: '50px' // 버튼과 제목이 겹치지 않게 보호
                             }}
                         >
                             <strong>{item.animationName}</strong>
@@ -123,6 +139,25 @@ export default function SavelistPage({ onBack }: Props) {
                                 {selectedId === item.animationId ? '불러오는 중...' : item.languageName}
                             </span>
                         </div>
+
+                        {/* 우측 상단 삭제 버튼 */}
+                        <button
+                            onClick={(e) => handleDelete(e, item.animationId)}
+                            style={{
+                                position: 'absolute',
+                                top: '16px',
+                                right: '16px',
+                                background: 'rgba(255, 107, 107, 0.1)',
+                                border: '1px solid rgba(255, 107, 107, 0.3)',
+                                color: '#ff6b6b',
+                                borderRadius: '6px',
+                                padding: '4px 8px',
+                                fontSize: '11px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            삭제
+                        </button>
 
                         <div style={{ fontSize: '13px', color: '#a0aec0' }}>
                             작성자: {item.creatorUsername}
