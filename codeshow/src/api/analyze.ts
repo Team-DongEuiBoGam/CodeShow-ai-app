@@ -1,15 +1,15 @@
 import axios from 'axios'
 import type { Step } from '../types/memory'
 
-// 백엔드 URL (나중에 실제 주소로 교체)
-const BASE_URL = 'http://localhost:8000'
+const BASE_URL = 'https://codeshow-backend.onrender.com'
 
 // ── 코드 분석 요청 ──
 export const analyzeCode = async (code: string, language: string): Promise<Step[]> => {
-    const res = await axios.post(`${BASE_URL}/api/analyze`, { code, language })
+    const res = await axios.post(`${BASE_URL}/api/ai/analyze`, { code, language })
     return res.data
 }
 
+// ── 회원가입 ──
 export const signup = async (loginId: string, password: string, username: string) => {
     const res = await axios.post(`${BASE_URL}/api/auth/signup`, {
         loginId,
@@ -20,9 +20,9 @@ export const signup = async (loginId: string, password: string, username: string
 }
 
 // ── 로그인 ──
-export const login = async (login_id: string, password: string) => {
+export const login = async (loginId: string, password: string) => {
     const res = await axios.post(`${BASE_URL}/api/auth/login`, {
-        loginId: login_id,   // ✅ camelCase로 수정
+        loginId,
         password
     })
     return res.data
@@ -44,7 +44,7 @@ export const saveAnimation = async (
     token: string
 ) => {
     const res = await axios.post(
-        `${BASE_URL}/api/animation/save`,
+        `${BASE_URL}/api/animations`,
         { user_id, language_id, animation_name, original_code, json_data },
         { headers: { Authorization: `Bearer ${token}` } }
     )
@@ -53,7 +53,7 @@ export const saveAnimation = async (
 
 // ── 저장 목록 불러오기 ──
 export const getAnimationList = async (user_id: number, token: string) => {
-    const res = await axios.get(`${BASE_URL}/api/animation/list`, {
+    const res = await axios.get(`${BASE_URL}/api/animations`, {
         params: { user_id },
         headers: { Authorization: `Bearer ${token}` }
     })

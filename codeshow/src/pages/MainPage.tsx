@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import CodeEditor from '../components/Editor/CodeEditor'
 import MemoryCanvas from '../components/Visualizer/MemoryCanvas'
 import { useAppStore } from '../store/useAppStore'
-import { mockAnalyze } from '../api/analyze'
+import { analyzeCode } from '../api/analyze'
 
 export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => void }) {
     const {
@@ -32,7 +32,7 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
         setIsAnalyzing(true)
         resetSteps()
         try {
-            const result = await mockAnalyze(language) // 백엔드 연동 시 analyzeCode()로 교체
+            const result = await analyzeCode(code, language)
             setSteps(result)
             nextStep()
             showToast('✅ 분석 완료!')
@@ -73,7 +73,6 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
                     </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    {/* 언어 탭 */}
                     {['java', 'python', 'c'].map(lang => (
                         <button key={lang} onClick={() => { setLanguage(lang); resetSteps() }}
                             style={{
@@ -128,7 +127,6 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
 
             {/* MAIN */}
             <main style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', flex: 1, overflow: 'hidden' }}>
-                {/* 에디터 */}
                 <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ padding: '8px 16px', background: '#181c26', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '11px', fontWeight: 600, color: '#7a8099', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                         🟣 코드 편집기
@@ -138,7 +136,6 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
                     </div>
                 </div>
 
-                {/* 시각화 */}
                 <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                     <div style={{ padding: '8px 16px', background: '#181c26', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '11px', fontWeight: 600, color: '#7a8099', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                         🟢 메모리 시각화
@@ -147,7 +144,6 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
                         <MemoryCanvas />
                     </div>
 
-                    {/* AI 설명 */}
                     {step?.explanation && (
                         <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', background: '#13161e', padding: '12px 16px', flexShrink: 0 }}>
                             <div style={{ fontSize: '11px', fontWeight: 700, color: '#6c8cff', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>
@@ -161,7 +157,6 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
                 </div>
             </main>
 
-            {/* TOAST */}
             {toast && (
                 <div style={{
                     position: 'fixed', bottom: '24px', right: '24px',
