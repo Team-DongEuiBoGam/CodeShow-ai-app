@@ -32,11 +32,24 @@ export interface User {
   token?: string
 }
 
-export interface SavedAnimation {
-  animation_code: number
-  animation_name: string
-  language_id: number
-  original_code: string
-  json_data: Step[]
-  create_date: string
+export interface AnimationSummary {
+  animationId: number
+  animationName: string
+  languageId: number
+  languageName: string
+  creatorUserNumber: number
+  creatorUsername: string
+  createdAt: string
+}
+
+export interface AnimationDetail {
+  animationId: number
+  animationName: string
+  originalCode: string
+  jsonData: string
+  languageId: number
+  languageName: string
+  creatorUserNumber: number
+  creatorUsername: string
+  createdAt: string
 }

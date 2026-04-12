@@ -1,28 +1,97 @@
-import { useState } from 'react';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import MainPage from './pages/MainPage';
+import { useEffect, useState } from 'react'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
+import MainPage from './pages/MainPage'
+import SavelistPage from './pages/SavelistPage'
+import Mypage from './pages/Mypage'
+import { useAppStore } from './store/useAppStore'
+import { getMe } from './api/analyze'
 
 export default function App() {
-  const [view, setView] = useState<'login' | 'register'>('login');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [view, setView] = useState<'login' | 'register' | 'main' | 'savelist' | 'mypage'>('login')
 
-  // 로그인/회원가입 완료 시 메인으로 이동
-  if (isLoggedIn) return <MainPage />;
+  const {
+    user,
+    hasHydrated,
+    setUser,
+    setIsGuest,
+    logout
+  } = useAppStore()
+
+  useEffect(() => {
+    const syncUser = async () => {
+      if (!hasHydrated) return
+
+      if (!user?.token) {
+        setView('login')
+        return
+      }
+
+      try {
+        const me = await getMe(user.token)
+
+        setUser({
+          user_id: me.userId ?? 0,
+          user_name: me.username,
+          login_id: me.loginId ?? '',
+          isMember: me.role === 'USER',
+          token: user.token
+        })
+
+        setIsGuest(me.role === 'GUEST')
+        setView((prev) => (prev === 'register' || prev === 'login' ? 'main' : prev))
+      } catch {
+        logout()
+        setView('login')
+      }
+    }
+
+    syncUser()
+  }, [hasHydrated])
+
+  if (!hasHydrated) {
+    return <div style={{ color: '#fff', padding: '24px' }}>불러오는 중...</div>
+  }
+
+  if (user?.token) {
+    if (view === 'savelist') {
+      return <SavelistPage onBack={() => setView('main')} />
+    }
+
+    if (view === 'mypage') {
+      return (
+        <Mypage
+          onBack={() => setView('main')}
+          onGoToSaveList={() => setView('savelist')}
+        />
+      )
+    }
+
+    return (
+      <MainPage
+        onGoToSaveList={() => setView('savelist')}
+        onGoToMypage={() => setView('mypage')}
+      />
+    )
+  }
 
   return (
     <>
       {view === 'login' ? (
-        <LoginPage 
-          onDone={() => setIsLoggedIn(true)} 
-          onGoToRegister={() => setView('register')} 
+        <LoginPage
+          onDone={() => {
+            setView('main')
+          }}
+          onGoToRegister={() => setView('register')}
         />
       ) : (
-        <RegisterPage 
-          onDone={() => setIsLoggedIn(true)} 
-          onBack={() => setView('login')} 
+        <RegisterPage
+          onDone={() => {
+            setView('main')
+          }}
+          onBack={() => setView('login')}
         />
       )}
     </>
-  );
+  )
 }
