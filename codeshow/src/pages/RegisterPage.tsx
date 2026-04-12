@@ -11,7 +11,7 @@ export default function RegisterPage({ onDone, onBack }: Props) {
     const setUser = useAppStore((s) => s.setUser)
     const setIsGuest = useAppStore((s) => s.setIsGuest)
 
-    const [email, setEmail] = useState('')
+    const [loginId, setLoginId] = useState('')
     const [userName, setUserName] = useState('')
     const [password, setPassword] = useState('')
     const [passwordConfirm, setPasswordConfirm] = useState('')
@@ -22,8 +22,13 @@ export default function RegisterPage({ onDone, onBack }: Props) {
         if (e) e.preventDefault()
         setError('')
 
-        if (!email || !userName || !password) {
+        if (!loginId || !userName || !password) {
             setError('모든 필드를 입력해주세요.')
+            return
+        }
+
+        if (loginId.trim().length < 4) {
+            setError('아이디는 최소 4자 이상 입력해야 합니다.')
             return
         }
 
@@ -44,7 +49,7 @@ export default function RegisterPage({ onDone, onBack }: Props) {
 
         setIsLoading(true)
         try {
-            const res = await signup(email, password, userName)
+            const res = await signup(loginId, password, userName)
             setUser({
                 user_id: res.userId,
                 user_name: res.username,
@@ -160,11 +165,11 @@ export default function RegisterPage({ onDone, onBack }: Props) {
 
                 <form style={containerStyle} onSubmit={handleRegister}>
                     <div style={inputWrapperStyle}>
-                        <div style={labelStyle}>이메일 주소</div>
+                        <div style={labelStyle}>아이디</div>
                         <input
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="example@email.com"
+                            value={loginId}
+                            onChange={(e) => setLoginId(e.target.value)}
+                            placeholder="아이디 입력"
                             style={inputStyle}
                         />
                     </div>
