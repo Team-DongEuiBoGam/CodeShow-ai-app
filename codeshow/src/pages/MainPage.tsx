@@ -4,7 +4,12 @@ import MemoryCanvas from '../components/Visualizer/MemoryCanvas'
 import { useAppStore } from '../store/useAppStore'
 import { analyzeCode, saveAnimation } from '../api/analyze'
 
-export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => void }) {
+interface Props {
+    onGoToSaveList: () => void
+    onGoToMypage: () => void
+}
+
+export default function MainPage({ onGoToSaveList, onGoToMypage }: Props) {
     const {
         user,
         isGuest,
@@ -18,8 +23,7 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
         prevStep,
         isAnalyzing,
         setIsAnalyzing,
-        resetSteps,
-        logout
+        resetSteps
     } = useAppStore()
 
     const [isAutoPlaying, setIsAutoPlaying] = useState(false)
@@ -112,11 +116,6 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
         }
     }
 
-    const handleLogout = () => {
-        logout()
-        window.location.reload()
-    }
-
     return (
         <div
             style={{
@@ -191,7 +190,8 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
                         </button>
                     ))}
 
-                    <div
+                    <button
+                        onClick={onGoToMypage}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -200,7 +200,9 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
                             background: '#1e2330',
                             border: '1px solid rgba(255,255,255,0.08)',
                             borderRadius: '999px',
-                            fontSize: '12px'
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            color: '#e8eaf0'
                         }}
                     >
                         <div
@@ -220,7 +222,7 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
                             {user ? user.user_name[0].toUpperCase() : 'G'}
                         </div>
                         {user ? user.user_name : '비회원'}
-                    </div>
+                    </button>
 
                     <button
                         onClick={handleSave}
@@ -258,25 +260,6 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
                         }}
                     >
                         📂 저장목록
-                    </button>
-
-                    <button
-                        onClick={handleLogout}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            padding: '6px 14px',
-                            background: 'transparent',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            borderRadius: '8px',
-                            fontSize: '13px',
-                            fontWeight: 500,
-                            cursor: 'pointer',
-                            color: '#ff8a8a'
-                        }}
-                    >
-                        ↩ 로그아웃
                     </button>
 
                     <button

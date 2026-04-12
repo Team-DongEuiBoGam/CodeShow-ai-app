@@ -3,11 +3,12 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import MainPage from './pages/MainPage'
 import SavelistPage from './pages/SavelistPage'
+import Mypage from './pages/Mypage'
 import { useAppStore } from './store/useAppStore'
 import { getMe } from './api/analyze'
 
 export default function App() {
-  const [view, setView] = useState<'login' | 'register' | 'main' | 'savelist'>('login')
+  const [view, setView] = useState<'login' | 'register' | 'main' | 'savelist' | 'mypage'>('login')
 
   const {
     user,
@@ -53,10 +54,24 @@ export default function App() {
   }
 
   if (user?.token) {
-    return view === 'savelist' ? (
-      <SavelistPage onBack={() => setView('main')} />
-    ) : (
-      <MainPage onGoToSaveList={() => setView('savelist')} />
+    if (view === 'savelist') {
+      return <SavelistPage onBack={() => setView('main')} />
+    }
+
+    if (view === 'mypage') {
+      return (
+        <Mypage
+          onBack={() => setView('main')}
+          onGoToSaveList={() => setView('savelist')}
+        />
+      )
+    }
+
+    return (
+      <MainPage
+        onGoToSaveList={() => setView('savelist')}
+        onGoToMypage={() => setView('mypage')}
+      />
     )
   }
 
