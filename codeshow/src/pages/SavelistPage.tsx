@@ -10,7 +10,7 @@ interface Props {
 export default function SavelistPage({ onBack }: Props) {
     const [list, setList] = useState<AnimationSummary[]>([])
     const [loading, setLoading] = useState(true)
-    const [error, setError] = useState('')
+    const [error, setError] = useState('') // 에러 메시지 상태
     const [selectedId, setSelectedId] = useState<number | null>(null)
 
     // 이름 수정 관련 상태
@@ -162,6 +162,22 @@ export default function SavelistPage({ onBack }: Props) {
                         ← 메인으로
                     </button>
                 </div>
+
+                {/* 에러 메시지 출력 영역 추가 - 이 부분에서 error 변수를 사용함 */}
+                {error && (
+                    <div style={{
+                        background: 'rgba(252, 129, 129, 0.1)',
+                        border: '1px solid rgba(252, 129, 129, 0.2)',
+                        color: '#fc8181',
+                        padding: '12px 20px',
+                        borderRadius: '12px',
+                        marginBottom: '24px',
+                        fontSize: '14px',
+                        textAlign: 'center'
+                    }}>
+                        ⚠️ {error}
+                    </div>
+                )}
 
                 {loading && <div style={{ textAlign: 'center', padding: '60px', color: '#7a8099' }}>⏳ 기록을 불러오는 중...</div>}
                 
