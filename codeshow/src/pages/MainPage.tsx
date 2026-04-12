@@ -18,7 +18,8 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
         prevStep,
         isAnalyzing,
         setIsAnalyzing,
-        resetSteps
+        resetSteps,
+        logout
     } = useAppStore()
 
     const [isAutoPlaying, setIsAutoPlaying] = useState(false)
@@ -109,6 +110,11 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
         } catch {
             showToast('❌ 저장 실패. 다시 시도해주세요')
         }
+    }
+
+    const handleLogout = () => {
+        logout()
+        window.location.reload()
     }
 
     return (
@@ -252,6 +258,25 @@ export default function MainPage({ onGoToSaveList }: { onGoToSaveList: () => voi
                         }}
                     >
                         📂 저장목록
+                    </button>
+
+                    <button
+                        onClick={handleLogout}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '6px 14px',
+                            background: 'transparent',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: '8px',
+                            fontSize: '13px',
+                            fontWeight: 500,
+                            cursor: 'pointer',
+                            color: '#ff8a8a'
+                        }}
+                    >
+                        ↩ 로그아웃
                     </button>
 
                     <button

@@ -13,10 +13,13 @@ export default function SavelistPage({ onBack }: Props) {
     const [error, setError] = useState('')
     const [selectedId, setSelectedId] = useState<number | null>(null)
 
-    const { setCode, setSteps, setCurrentStep, setLanguage } = useAppStore()
-
-    const userRaw = localStorage.getItem('user')
-    const user = userRaw ? JSON.parse(userRaw) : null
+    const {
+        user,
+        setCode,
+        setSteps,
+        setCurrentStep,
+        setLanguage
+    } = useAppStore()
 
     useEffect(() => {
         const fetchList = async () => {
@@ -28,10 +31,10 @@ export default function SavelistPage({ onBack }: Props) {
 
             try {
                 setLoading(true)
+                setError('')
                 const data = await getAnimationList(0, 10, user.token)
                 setList(data)
-            } catch (err) {
-                console.error(err)
+            } catch {
                 setError('저장 목록을 불러오지 못했습니다.')
             } finally {
                 setLoading(false)
@@ -39,7 +42,7 @@ export default function SavelistPage({ onBack }: Props) {
         }
 
         fetchList()
-    }, [])
+    }, [user])
 
     const handleOpenDetail = async (animationId: number) => {
         if (!user?.token) {
@@ -49,6 +52,7 @@ export default function SavelistPage({ onBack }: Props) {
 
         try {
             setSelectedId(animationId)
+            setError('')
 
             const detail = await getAnimationDetail(animationId, user.token)
             const parsedSteps: Step[] = JSON.parse(detail.jsonData)
@@ -61,12 +65,11 @@ export default function SavelistPage({ onBack }: Props) {
                 const lower = detail.languageName.toLowerCase()
                 if (lower.includes('java')) setLanguage('java')
                 else if (lower.includes('python')) setLanguage('python')
-                else if (lower.includes('c')) setLanguage('c')
+                else if (lower === 'c' || lower.includes('c ')) setLanguage('c')
             }
 
             onBack()
-        } catch (err) {
-            console.error(err)
+        } catch {
             setError('상세 데이터를 불러오지 못했습니다.')
         } finally {
             setSelectedId(null)

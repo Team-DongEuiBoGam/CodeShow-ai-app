@@ -73,6 +73,15 @@ const inferLineNumber = (variableName: string, code: string) => {
     return idx >= 0 ? idx + 1 : 1
 }
 
+export const getMe = async (token: string) => {
+    const res = await api.get('/api/auth/me', {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    return res.data
+}
+
 const buildStepFromVariables = (
     variables: RawVariable[],
     operations: RawOperation[],
