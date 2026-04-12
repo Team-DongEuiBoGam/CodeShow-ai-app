@@ -93,13 +93,20 @@ const buildStepFromVariables = (
     const heap: MemBlock[] = []
 
     variables.forEach((variable, index) => {
+        const safeName = variable.name || `var_${index}`
+        const safeType = typeof variable.type === 'string' ? variable.type : 'unknown'
+        const safeValue =
+            variable.value === null || variable.value === undefined
+                ? 'null'
+                : String(variable.value)
+
         const matchedOp =
             operations.find(
-                (op) => op.to === variable.name || op.target === variable.name
+                (op) => op.to === safeName || op.target === safeName
             ) ?? operations[index]
 
         const isStringObject =
-            variable.type.toLowerCase() === 'string' &&
+            safeType.toLowerCase() === 'string' &&
             typeof variable.value === 'string'
 
         if (isStringObject) {
@@ -107,50 +114,50 @@ const buildStepFromVariables = (
 
             heap.push({
                 id: heapId,
-                name: `"${String(variable.value)}"`,
-                value: String(variable.value),
-                type: variable.type
+                name: `"${safeValue}"`,
+                value: safeValue,
+                type: safeType
             })
 
             stack.push({
-                id: variable.name,
-                name: variable.name,
+                id: safeName,
+                name: safeName,
                 value: `${heapId} (참조)`,
-                type: variable.type,
+                type: safeType,
                 isRef: true,
                 refTarget: heapId,
                 highlight: true
             })
         } else {
             stack.push({
-                id: variable.name,
-                name: variable.name,
-                value: String(variable.value),
-                type: variable.type,
+                id: safeName,
+                name: safeName,
+                value: safeValue,
+                type: safeType,
                 highlight: true
             })
         }
 
         const stepStack = stack.map((item) => ({
             ...item,
-            highlight: item.id === variable.name
+            highlight: item.id === safeName
         }))
 
         const stepHeap = heap.map((item) => ({
             ...item,
             highlight:
-                stack.find((s) => s.id === variable.name)?.refTarget === item.id
+                stack.find((s) => s.id === safeName)?.refTarget === item.id
         }))
 
-        const currentVar = stepStack.find((s) => s.id === variable.name)
+        const currentVar = stepStack.find((s) => s.id === safeName)
 
         steps.push({
             step: index + 1,
-            line: inferLineNumber(variable.name, code),
+            line: inferLineNumber(safeName, code),
             desc:
                 matchedOp?.description ||
                 variable.description ||
-                `${variable.name} 변수 생성`,
+                `${safeName} 변수 생성`,
             explanation,
             stack: stepStack,
             heap: stepHeap,
@@ -217,12 +224,15 @@ export const analyzeCode = async (
     language: string,
     token?: string
 ): Promise<Step[]> => {
-    void language
+    const requestText = `Language: ${language}
+
+Code:
+${code}`
 
     try {
         const res = await api.post(
             '/api/ai/analyze',
-            JSON.stringify(code),
+            JSON.stringify(requestText),
             {
                 headers: {
                     'Content-Type': 'application/json',
