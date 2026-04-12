@@ -225,22 +225,23 @@ export const analyzeCode = async (
     language: string,
     token?: string
 ): Promise<Step[]> => {
-    const requestText = `Language: ${language}
-
-Code:
-${code}`
+    void language
 
     try {
         const res = await api.post(
             '/api/ai/analyze',
-            JSON.stringify(requestText),
+            code,
             {
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'text/plain; charset=utf-8',
                     ...(token ? { Authorization: `Bearer ${token}` } : {})
                 }
             }
         )
+
+        console.log('analyze raw response:', res.data)
+        console.log('analyze raw response type:', typeof res.data)
+        console.log('analyze raw response json:', JSON.stringify(res.data, null, 2))
 
         return normalizeAnalyzeResponse(res.data, code)
     } catch (error: any) {
