@@ -332,3 +332,32 @@ export const getLanguages = async () => {
     const res = await api.get('/api/languages')
     return res.data
 }
+
+export const updateAnimationName = async (
+    animationId: number,
+    animationName: string,
+    token: string
+) => {
+    const res = await api.patch(
+        `/api/animations/${animationId}`,
+        { animationName },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    )
+    return res.data
+}
+
+export const deleteAnimation = async (
+    animationId: number,
+    token: string
+) => {
+    const res = await api.delete(`/api/animations/${animationId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    return res.data
+}
